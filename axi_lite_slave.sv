@@ -25,31 +25,35 @@ module axi_lite_slave #(
     parameter DATA_WIDTH = 32
 )(
     axi_lite_if.Slave slave_if
+    output reg [DATA_WIDTH-1:0] dut_mem
 );
-    reg   [DATA_WIDTH - 1:0] mem    [0:63];
+    reg   [DATA_WIDTH-1:0] mem    [0:63];
     localparam ADDR_LSB = $clog2(DATA_WIDTH/8);
-    logic   clk_measured;
-    logic   rst_measured;
-    logic                    axi_awready;
-    logic                    axi_wready;
-    logic                    axi_bvalid;
-    logic [ADDR_WIDTH - 1:0] axi_waddr;
-    logic [DATA_WIDTH - 1:0] axi_wdata;
-    logic [3:0]              axi_wstrb;
-    logic [ADDR_WIDTH - 1:0] waddr_buffer;
-    logic [DATA_WIDTH - 1:0] wdata_buffer;
-    logic [3:0]              wstrb_buffer;
 
-    logic                    axi_arready;
-    logic                    axi_rvalid;
-    logic [ADDR_WIDTH - 1:0] axi_araddr;
-    logic [DATA_WIDTH - 1:0] axi_rdata;
-    logic [ADDR_WIDTH - 1:0] raddr_buffer;
+    logic                  axi_awready;
+    logic                  axi_wready;
+    logic                  axi_bvalid;
+    logic [ADDR_WIDTH-1:0] axi_waddr;
+    logic [DATA_WIDTH-1:0] axi_wdata;
+    logic [3:0]            axi_wstrb;
+    logic [ADDR_WIDTH-1:0] waddr_buffer;
+    logic [DATA_WIDTH-1:0] wdata_buffer;
+    logic [3:0]            wstrb_buffer;
+
+    logic                  axi_arready;
+    logic                  axi_rvalid;
+    logic [ADDR_WIDTH-1:0] axi_araddr;
+    logic [DATA_WIDTH-1:0] axi_rdata;
+    logic [ADDR_WIDTH-1:0] raddr_buffer;
 
     logic        read_stalled;
     logic        write_addr_received;
     logic        write_data_received;
     logic        write_response_stalled;
+
+    //FOR DEBUG
+    logic                  clk_measured;
+    logic                  rst_measured;
     
     assign clk_measured = slave_if.clk;
     assign rst_measured = slave_if.rst_n;
@@ -143,4 +147,8 @@ module axi_lite_slave #(
         else axi_araddr = raddr_buffer;
     end
 
+    always @(*) begin
+        //Data output for UVM
+        dut_mem = mem;
+    end
 endmodule

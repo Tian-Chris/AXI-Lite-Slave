@@ -1,60 +1,50 @@
-class coverage extends uvm_subscriber #(command_s);
+class coverage extends uvm_subscriber #(axi_transaction);
    `uvm_component_utils(coverage)
-   command_s cmd;
+   axi_transaction cmd;
 
-   covergroup cg_axi_lite;
-      // addr bins: list explicit registers and grouped others
-      coverpoint cmd.addr {
-         bins reg0 = {32'h00};
-         bins reg1 = {32'h04};
-         bins reg2 = {32'h08};
-         bins reserved = {[32'h0C:32'h0FFF]};
+   localparam int HISTORY_SIZE = 4;
+   axi_transaction op_history[$];
+   int addr_history[$];
+
+   covergroup cg_axi_lite @(posedge clk);
+      coverpoint cmd.addr;
+      coverpoint cmd.data;
+
+      coverpoint cmd.op {
+         bins rst   = {rst_op};
+         bins write = {w_op};
+         bins read  = {r_op};
+         bins noop  = {no_op};
       }
 
-      coverpoint cmd.data {
-         bins all = {[32'h00:32'h0FFF]};
+      coverpoint addr_history[0] {ignore_bins all = default;}
+      coverpoint addr_history[1] {ignore_bins all = default;}
+      coverpoint addr_history[2] {ignore_bins all = default;}
+      coverpoint addr_history[3] {ignore_bins all = default;}
+      cross addr_history[0], addr_history[1], addr_history[2], addr_history[3] {
+         bins one_sequential = {addr_history[0]+4 == addr_history[1]};
+         bins two_sequential = {addr_history[0]+8 == addr_history[1]+4 == == addr_history[2]};
+         bins three_sequential = {addr_history[0]+8 == addr_history[1]+4 == == addr_history[2]};
+         bins non_sequential = default;
       }
 
-      // operation type
-      // coverpoint cmd.op {
-      //    bins 
-      // }
+      coverpoint op_history[0] {ignore_bins all = default;}
+      coverpoint op_history[1] {ignore_bins all = default;}
+      coverpoint op_history[2] {ignore_bins all = default;}
+      coverpoint op_history[3] {ignore_bins all = default;}
 
-      // // write strobes (WSTRB) - include common partial combos
-      // coverpoint wstrb {
-      //    bins b0 = {4'b0001};
-      //    bins b1 = {4'b0010};
-      //    bins b2 = {4'b0100};
-      //    bins b3 = {4'b1000};
-      //    bins low_half = {4'b0011,4'b1100};
-      //    bins all = {4'b1111};
-      // }
+      cross op_history[0], op_history[1], op_history[2], op_history[3] {
+         bins 2_write = {w_op, w_op, default, default};
+         bins 3_write = {w_op, w_op, w_op, default};
+         bins 4_write = {w_op, w_op, w_op, w_op};
 
-      // // response codes
-      // coverpoint resp {
-      //    bins okay   = {2'b00};
-      //    bins slverr = {2'b10};
-      //    bins decerr = {2'b11};
-      // }
+         bins 2_read = {r_op, r_op, default, default};
+         bins 3_read = {r_op, r_op, r_op, default};
+         bins 4_read = {r_op, r_op, r_op, r_op};
+      }
 
-      // // handshake delays measured in cycles
-      // coverpoint awready_delay {
-      //    bins zero = {0};
-      //    bins short = {[1:3]};
-      //    bins long  = {[4:31]};
-      // }
-      // coverpoint wready_delay = awready_delay;
-      // coverpoint rvalid_delay {
-      //    bins zero  = {0};
-      //    bins short = {[1:3]};
-      //    bins long  = {[4:31]};
-      // }
-
-      // cross coverage (most important)
-      cross cmd.addr, cmd.data;         // every reg both read & written (if applicable)
-      // cross addr, wstrb;            // partial write effects per register
-      // cross is_write, resp;         // writes/reads with different responses
-      // cross addr, awready_delay;    // registers w/ wait states
+      cross addr, data;
+      
    endgroup
 
    function new (string name, uvm_component parent);
@@ -62,9 +52,14 @@ class coverage extends uvm_subscriber #(command_s);
       cg_axi_lite = new();
    endfunction
 
-   function void write(command_s t);
-      cmd.addr = t.addr;
-      cmd.data = t.data;
+   function void write(axi_transaction t);
+      cmd = t.do_copy;
+
+      op_history.push_back(cmd.op);
+      addr_history.push_back(cmd.addr);
+      if(op_history.size() > HISTORY_SIZE) op_history.pop_front();
+      if(addr_history.size() > HISTORY_SIZE) addr_history.pop_front();
+
       cg_axi_lite.sample();
    endfunction
 endclass

@@ -13,8 +13,10 @@ package axi_test_pkg;
     } op_code;           
 
     typedef struct {
-        byte unsigned addr;
-        byte unsigned data;
-        op_code       op; 
+        [ADDR_WIDTH-1:0] addr;
+        [DATA_WIDTH-1:0] data;
+        op_code          op; 
     } command_s;
+
+    typedef uvm_sequencer #(sequence_item) sequencer;
 endpackage
