@@ -4,6 +4,10 @@ class scoreboard extends uvm_subscriber #(axi_transaction);
     logic [DATA_WIDTH-1:0] mem [63:0];
     int total_count, success_count;
 
+    function new (string name, uvm_component parent);
+        super.new(name, parent);
+    endfunction
+    
     function void build_phase(uvm_phase phase);
         res = new ("res", this);
         total_count = 0;
@@ -25,12 +29,9 @@ class scoreboard extends uvm_subscriber #(axi_transaction);
         end
     endfunction 
 
-    function new (string name, uvm_component parent);
-        super.new(name, parent);
-    endfunction
-
-    final begin
-    `uvm_info("SCOREBOARD", $sformatf("Total ops: %0d, Success: %0d, Fail: %0d", 
+   function void final_phase(uvm_phase phase);
+        super.final_phase(phase);
+        `uvm_info("SCOREBOARD", $sformatf("Total ops: %0d, Success: %0d, Fail: %0d", 
                 total_count, success_count, total_count - success_count), UVM_LOW)
-    end
+    endfunction
 endclass

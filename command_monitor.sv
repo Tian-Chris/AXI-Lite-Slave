@@ -4,7 +4,7 @@ class command_monitor extends uvm_component;
 
     function void write_to_monitor(axi_transaction cmd);
         axi_transaction copy;
-        copy = cmd.do_copy;
+        copy = cmd.get_copy();
         $display("COMMAND MONITOR: addr:0x%2h data:0x%2h op: %s", copy.addr, copy.data, copy.op.name());
         ap.write(copy);
     endfunction

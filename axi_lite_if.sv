@@ -1,5 +1,6 @@
 interface axi_lite_if #(parameter ADDR_WIDTH=8, DATA_WIDTH=32);
     import axi_test_pkg::*;
+
     logic                  clk;
     logic                  rst_n;
 
@@ -29,7 +30,7 @@ interface axi_lite_if #(parameter ADDR_WIDTH=8, DATA_WIDTH=32);
     result_monitor         result_monitor_h;
 
     // For UVM checking only
-    logic [DATA_WIDTH-1:0] dut_mem
+    logic [DATA_WIDTH-1:0] dut_mem [0:63];
 
     modport Master (
         input  AWREADY, WREADY, BVALID, ARREADY, RVALID, RDATA,
@@ -139,7 +140,7 @@ interface axi_lite_if #(parameter ADDR_WIDTH=8, DATA_WIDTH=32);
     always @(posedge clk) begin : rslt_monitor
         if (RVALID == 1) begin
             if (read_buffer.size() == 0) begin
-                `uvm_info("READ FAILED DUE TO MISSING BUFFER", UVM_LOW)
+                `uvm_info("AXI_IF", "READ FAILED DUE TO MISSING BUFFER", UVM_LOW)
             end else begin
                 axi_transaction tr = read_buffer.pop_front();
                 tr.data = RDATA; 
@@ -149,7 +150,7 @@ interface axi_lite_if #(parameter ADDR_WIDTH=8, DATA_WIDTH=32);
 
         if (BVALID == 1) begin
             if (write_buffer.size() == 0) begin
-                `uvm_info("WRITE FAILED DUE TO MISSING BUFFER", UVM_LOW)
+                `uvm_info("AXI_IF", "WRITE FAILED DUE TO MISSING BUFFER", UVM_LOW)
             end else begin
                 axi_transaction tr = write_buffer.pop_front();
                 tr.data = dut_mem[tr.addr]; 

@@ -1,6 +1,8 @@
 package axi_test_pkg;
     import uvm_pkg::*;
     `include "uvm_macros.svh"
+    `include "transaction.sv"
+    
     localparam ADDR_WIDTH = 8;
     localparam DATA_WIDTH = 32;
 
@@ -13,10 +15,10 @@ package axi_test_pkg;
     } op_code;           
 
     typedef struct {
-        [ADDR_WIDTH-1:0] addr;
-        [DATA_WIDTH-1:0] data;
+        logic [ADDR_WIDTH-1:0] addr;
+        logic [DATA_WIDTH-1:0] data;
         op_code          op; 
     } command_s;
 
-    typedef uvm_sequencer #(sequence_item) sequencer;
+    typedef uvm_sequencer #(axi_transaction) sequencer;
 endpackage

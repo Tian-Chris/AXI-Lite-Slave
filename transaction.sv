@@ -1,3 +1,5 @@
+import uvm_pkg::*;
+`include "uvm_macros.svh"
 class axi_transaction extends uvm_sequence_item;
     `uvm_object_utils(axi_transaction);
 
@@ -5,8 +7,8 @@ class axi_transaction extends uvm_sequence_item;
         super.new(name);
     endfunction
     
-    rand [DATA_WIDTH-1:0]    data;
-    rand [ADDR_WIDTH-1:0]    addr;
+    rand logic [DATA_WIDTH-1:0]    data;
+    rand logic [ADDR_WIDTH-1:0]    addr;
     rand op_code             op;
     
     constraint op_con {op dist {no_op := 1, w_op := 9, r_op:=9, rst_op:=1};}
@@ -37,9 +39,17 @@ class axi_transaction extends uvm_sequence_item;
         op = RHS.op;
     endfunction
 
+    function axi_transaction get_copy();
+        axi_transaction out;
+        out.data = this.data;
+        out.addr = this.addr;
+        out.op = this.op;
+        return out;
+    endfunction
+    
     function string convert2string();
         string transaction;
-        transaction = $sformatf("OP: %s = %4h || data: %2h  addr: %2h ", op.name() data, addr);
+        transaction = $sformatf("OP: %s = %4h || data: %8h  addr: %8h ", op.name(), data, addr);
         return transaction;
     endfunction
 endclass
