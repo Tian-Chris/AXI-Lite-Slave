@@ -25,9 +25,9 @@ module axi_lite_slave #(
     parameter DATA_WIDTH = 32
 )(
     axi_lite_if.Slave slave_if,
-    output reg [DATA_WIDTH-1:0] dut_mem [0:63]
+    output reg [DATA_WIDTH-1:0] dut_mem [ADDR_WIDTH-1:0]
 );
-    reg   [DATA_WIDTH-1:0] mem    [0:63];
+    reg   [DATA_WIDTH-1:0] mem   [ADDR_WIDTH-1:0];
     localparam ADDR_LSB = $clog2(DATA_WIDTH/8);
 
     logic                  axi_awready;

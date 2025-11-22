@@ -30,7 +30,7 @@ interface axi_lite_if #(parameter ADDR_WIDTH=8, DATA_WIDTH=32);
     result_monitor         result_monitor_h;
 
     // For UVM checking only
-    logic [DATA_WIDTH-1:0] dut_mem [0:63];
+    logic [DATA_WIDTH-1:0] dut_mem [ADDR_WIDTH-1:0];
 
     modport Master (
         input  AWREADY, WREADY, BVALID, ARREADY, RVALID, RDATA,

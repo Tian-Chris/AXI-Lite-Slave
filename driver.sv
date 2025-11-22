@@ -6,11 +6,12 @@ class driver extends uvm_driver #(axi_transaction);
         if(!uvm_config_db #(virtual axi_lite_if)::get(null, "*","axi_if", axi_if))
             `uvm_fatal("DRIVER", "Failed to get axi_if")
     endfunction
+    
     task run_phase(uvm_phase phase);
         axi_transaction cmd;
         forever begin
             seq_item_port.get_next_item(cmd);
-            axi_if.do_op(cmd.data, cmd.addr, cmd.op);
+            axi_if.do_op(cmd);
             seq_item_port.item_done();
         end
     endtask 

@@ -14,9 +14,9 @@ class scoreboard extends uvm_subscriber #(axi_transaction);
         success_count = 0;
     endfunction
 
-    function void write(axi_transaction cmd);
+    function void write(axi_transaction t);
         axi_transaction result;
-        case (cmd.op)
+        case (t.op)
             rst_op: foreach (mem[i]) mem[i] = '0;
             w_op: mem[t.addr] = t.data; 
         endcase

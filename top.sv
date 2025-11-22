@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 module top ();
     import uvm_pkg::*;
     import   axi_test_pkg::*;

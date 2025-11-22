@@ -20,7 +20,7 @@ class multi_read_sequence extends uvm_sequence #(axi_transaction);
             cmd = axi_transaction::type_id::create("cmd");
             start_item(cmd);
             cmd.random_write();
-            written_addr.push_back(cmd.do_copy());
+            written_addr.push_back(cmd.get_copy());
             finish_item(cmd);
         end
         for (int i = 0; i < num_reads; i++) begin

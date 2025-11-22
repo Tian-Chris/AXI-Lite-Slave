@@ -20,7 +20,6 @@ class seq_write_sequence extends uvm_sequence #(axi_transaction); //sequential
         cmd.random_write();
         initial_addr = cmd.addr;
         finish_item(cmd);
-        `uvm_info("WRITE_SEQ", $sformatf("Write %0d: %s", i, cmd.convert2string()), UVM_HIGH)
         for (int i = 0; i < num_writes; i++) begin
             cmd = axi_transaction::type_id::create("cmd");
             start_item(cmd);

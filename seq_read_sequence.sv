@@ -16,14 +16,13 @@ class seq_read_sequence extends uvm_sequence #(axi_transaction); //sequential
             `uvm_error("RAND_FAIL","Failed to randomize num_reads");
         `uvm_info("READ_MULTI", $sformatf("Sequence will run %0d reads", num_reads), UVM_HIGH)
 
-        `uvm_info("READ_SEQ", $sformatf("Sequence will run %0d writes", num_writes), UVM_HIGH)
+        `uvm_info("READ_SEQ", $sformatf("Sequence will run %0d writes", num_reads), UVM_HIGH)
         cmd = axi_transaction::type_id::create("cmd");
         start_item(cmd);
         cmd.random_write();
         initial_addr = cmd.addr;
         finish_item(cmd);
-        `uvm_info("READ_SEQ", $sformatf("Write %0d: %s", i, cmd.convert2string()), UVM_HIGH)
-        for (int i = 0; i < num_writes; i++) begin
+        for (int i = 0; i < num_reads; i++) begin
             cmd = axi_transaction::type_id::create("cmd");
             start_item(cmd);
             cmd.random_write();
@@ -31,7 +30,7 @@ class seq_read_sequence extends uvm_sequence #(axi_transaction); //sequential
             finish_item(cmd);
             `uvm_info("READ_SEQ", $sformatf("Write %0d: %s", i, cmd.convert2string()), UVM_HIGH)
         end
-        for (int i = 0; i < num_writes + 1; i++) begin
+        for (int i = 0; i < num_reads + 1; i++) begin
             cmd = axi_transaction::type_id::create("cmd");
             start_item(cmd);
             cmd.random_read();
