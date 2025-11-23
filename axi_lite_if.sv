@@ -77,20 +77,7 @@ interface axi_lite_if #(parameter ADDR_WIDTH=8, DATA_WIDTH=32);
 
         // Response
         BREADY  <= 1;
-
-        // Wait for AW and W handshake
         @(posedge clk);
-        while (!AWREADY || !WREADY)
-            @(posedge clk);
-
-        AWVALID <= 0;
-        WVALID  <= 0;
-
-        // Wait for BVALID
-        @(posedge clk);
-        while (!BVALID)
-            @(posedge clk);
-        axi_if.BREADY <= 0;
     endtask
 
     // -------------------------
@@ -101,15 +88,7 @@ interface axi_lite_if #(parameter ADDR_WIDTH=8, DATA_WIDTH=32);
         ARADDR  <= addr;
         ARVALID <= 1;
         RREADY  <= 1;
-        while (!ARREADY)
-            @(posedge clk);
-        ARVALID <= 0;
-
-        // Wait for read data valid
         @(posedge clk);
-        while (!RVALID)
-            @(posedge clk);
-        RREADY <= 0;
     endtask
     
     task reset();
@@ -123,22 +102,37 @@ interface axi_lite_if #(parameter ADDR_WIDTH=8, DATA_WIDTH=32);
 
     task do_op(axi_transaction cmd);
         command_monitor_h.write_to_monitor(cmd);
-
+        //if (!ARREADY) ARVALID <= 0;
+        //if (!RVALID) RREADY <= 0;
+        //if (!AWREADY || !WREADY) begin
+            //AWVALID <= 0;
+            //WVALID  <= 0;
+        //end
+        //if (!BVALID) BREADY <= 0;
+        
         case (cmd.op)
             w_op: begin
                 write_buffer.push_back(cmd);
                 axi_write(cmd.addr, cmd.data);
+                if (!ARREADY) ARVALID <= 0;
+                if (!RVALID) RREADY <= 0;
+
             end
             r_op: begin 
                 read_buffer.push_back(cmd);
                 axi_read(cmd.addr);
+                if (!AWREADY || !WREADY) begin
+                    AWVALID <= 0;
+                    WVALID  <= 0;
+                end
+                if (!BVALID) BREADY <= 0;
             end
             rst_op: reset();
         endcase
     endtask
 
     always @(posedge clk) begin : rslt_monitor
-        if (RVALID == 1) begin
+        if (RVALID == 1 && RREADY == 1) begin
             if (read_buffer.size() == 0) begin
                 `uvm_info("AXI_IF", "READ FAILED DUE TO MISSING BUFFER", UVM_LOW)
             end else begin
@@ -148,7 +142,7 @@ interface axi_lite_if #(parameter ADDR_WIDTH=8, DATA_WIDTH=32);
             end
         end
 
-        if (BVALID == 1) begin
+        if (BVALID == 1 && BREADY == 1) begin
             if (write_buffer.size() == 0) begin
                 `uvm_info("AXI_IF", "WRITE FAILED DUE TO MISSING BUFFER", UVM_LOW)
             end else begin

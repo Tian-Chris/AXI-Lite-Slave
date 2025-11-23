@@ -12,7 +12,7 @@ class seq_read_sequence extends uvm_sequence #(axi_transaction); //sequential
     endfunction
 
     task body();
-        assert(randomize()) else
+        assert(num_writes.randomize()) else
             `uvm_error("RAND_FAIL","Failed to randomize num_reads");
         `uvm_info("READ_MULTI", $sformatf("Sequence will run %0d reads", num_reads), UVM_HIGH)
 
@@ -38,5 +38,4 @@ class seq_read_sequence extends uvm_sequence #(axi_transaction); //sequential
             finish_item(cmd);
             `uvm_info("READ_SEQ", $sformatf("READ %0d: %s", i, cmd.convert2string()), UVM_HIGH)
         end
-    endtask
-endclass
+    endtas

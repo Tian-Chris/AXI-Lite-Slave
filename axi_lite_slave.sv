@@ -109,12 +109,11 @@ module axi_lite_slave #(
     end
 
     always @(posedge slave_if.clk) begin
-        if(write_addr_received && write_data_received && slave_if.BREADY) begin
-            automatic int word_index = axi_waddr[ADDR_WIDTH-1:ADDR_LSB];
-            if (axi_wstrb[0]) mem[word_index][7:0]     <= axi_wdata[7:0];
-            if (axi_wstrb[1]) mem[word_index][15:8]    <= axi_wdata[15:8];
-            if (axi_wstrb[2]) mem[word_index][23:16]   <= axi_wdata[23:16];
-            if (axi_wstrb[3]) mem[word_index][31:24]   <= axi_wdata[31:24];
+        if(write_addr_received && write_data_received) begin
+            if (axi_wstrb[0]) mem[axi_waddr][7:0]     <= axi_wdata[7:0];
+            if (axi_wstrb[1]) mem[axi_waddr][15:8]    <= axi_wdata[15:8];
+            if (axi_wstrb[2]) mem[axi_waddr][23:16]   <= axi_wdata[23:16];
+            if (axi_wstrb[3]) mem[axi_waddr][31:24]   <= axi_wdata[31:24];
         end
     end
 

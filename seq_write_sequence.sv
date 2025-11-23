@@ -12,7 +12,7 @@ class seq_write_sequence extends uvm_sequence #(axi_transaction); //sequential
     endfunction
 
     task body();
-        assert(randomize()) else
+        assert(num_writes.randomize()) else
             `uvm_error("RAND_FAIL","Failed to randomize num_writes");
         `uvm_info("WRITE_SEQ", $sformatf("Sequence will run %0d writes", num_writes), UVM_HIGH)
         cmd = axi_transaction::type_id::create("cmd");
@@ -28,5 +28,4 @@ class seq_write_sequence extends uvm_sequence #(axi_transaction); //sequential
             finish_item(cmd);
             `uvm_info("WRITE_MULTI", $sformatf("Write %0d: %s", i, cmd.convert2string()), UVM_HIGH)
         end
-    endtask
-endclass
+    endtas

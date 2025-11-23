@@ -11,7 +11,7 @@ class multi_write_sequence extends uvm_sequence #(axi_transaction);
     endfunction
 
     task body();
-        assert(randomize()) else
+        assert(num_writes.randomize()) else
             `uvm_error("RAND_FAIL","Failed to randomize num_writes");
         `uvm_info("WRITE_MULTI", $sformatf("Sequence will run %0d writes", num_writes), UVM_HIGH)
 
@@ -22,5 +22,4 @@ class multi_write_sequence extends uvm_sequence #(axi_transaction);
             finish_item(cmd);
             `uvm_info("WRITE_MULTI", $sformatf("Write %0d: %s", i, cmd.convert2string()), UVM_HIGH)
         end
-    endtask
-endclass
+    endtas

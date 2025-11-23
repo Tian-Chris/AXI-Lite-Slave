@@ -9,8 +9,9 @@ class axi_transaction #(parameter DW = DATA_WIDTH, parameter AW = ADDR_WIDTH) ex
         super.new(name);
     endfunction
     
+    localparam ADDR_SIZE = $clog2(AW);
     rand logic [DW-1:0]      data;
-    rand logic [AW-1:0]      addr;
+    rand logic [ADDR_SIZE-1:0]      addr;
     rand op_code             op;
     
     constraint op_con {op dist {no_op := 1, w_op := 9, r_op:=9, rst_op:=1};}
@@ -56,6 +57,4 @@ class axi_transaction #(parameter DW = DATA_WIDTH, parameter AW = ADDR_WIDTH) ex
     function string convert2string();
         string transaction;
         transaction = $sformatf("OP: %s || data: %8h  addr: %8h ", op.name(), data, addr);
-        return transaction;
-    endfunction
-endclass
+      
