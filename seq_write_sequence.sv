@@ -28,4 +28,5 @@ class seq_write_sequence extends uvm_sequence #(axi_transaction); //sequential
             finish_item(cmd);
             `uvm_info("WRITE_MULTI", $sformatf("Write %0d: %s", i, cmd.convert2string()), UVM_HIGH)
         end
-    endtas
+    endtask
+endclass
